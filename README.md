@@ -15,13 +15,18 @@ Limitations
 + networkoversleep is also omitted because it cannot be changed.
 + wake on modem ring is omitted because it wasn't a high priority for me.
 
+API Change v0.2
+---------------
+
+If you checked out an earlier version of the module, the behaviour of the name variable has changed.
+The resource name is now the power policy you want to set. It can be either `charger` or `battery`.
+You cannot use `all` because it would create a conflicting policy with the more specific power source policies.
+The power source type `ups` is also not currently supported.
+
 Example
 -------
 
 All of the parameters supplied below are optional.
-
-CHANGED: The namevar is now the name of the power source. This is one of either `charger` or `battery`. The `charger`
-source also includes systems plugged into AC Power.
 
 ```ruby
 
