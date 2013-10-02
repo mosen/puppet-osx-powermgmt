@@ -1,14 +1,7 @@
-# pmset provider for mac os x power management settings
-# At the moment we can only set power on all sources, because pmset will not report one setting list per power source with -g option
 Puppet::Type.newtype(:powermgmt) do
-  @doc = "Manage power management settings."
-
-  # Switches to pmset depending on power source
-  PuppetToNativeSwitchMap = {
-    :all => '-a',
-    :battery => '-b',
-    :charger => '-c',
-    :ups => '-u', }
+  @doc = 'Manage power management/energy saver settings. The namevar can be
+  one of `charger` or `battery` if you want to apply a different policy for each
+  '
 
   def munge_boolean(value)
     case value
@@ -26,53 +19,47 @@ Puppet::Type.newtype(:powermgmt) do
   rescue ArgumentError
       fail("munge_integer only takes integers")
   end
-  
-  newparam(:name) do
-    desc "Name of this power management setting"
-    
+
+  newparam(:source) do
+    desc "The type(s) of power source to apply this setting to: charger or battery. AC power also counts as charger."
+
+    # UPS currently unsupported
+    # I removed :all as an option because it would allow you to create two resources that conflict with each other.
+    newvalues(:battery, :charger)
     isnamevar
   end
-  
-  newparam(:source) do
-    desc "The type(s) of power source to apply this setting to."
-    # The -a, -b, -c, -u flags determine whether the settings apply to battery ( -b ), charger (wall power) ( -c ),
-    # UPS ( -u ) or all ( -a ).
-    newvalues(:all, :battery, :charger, :ups)
-    defaultto :all
+
+  newproperty(:display_sleep) do
+    desc "Display sleep time (in minutes). Set to zero to disable."
+
+    munge do |value|
+      @resource.munge_integer(value)
+    end
+    defaultto 10 # Mac OS X Default
   end
-  
+
+  newproperty(:disk_sleep) do
+    desc "Disk sleep/spin down time (in minutes). Set to zero to disable."
+
+    munge do |value|
+      @resource.munge_integer(value)
+    end
+    defaultto 10 # Mac OS X Default
+  end
+
   newproperty(:sleep) do
-    desc "System sleep time (in minutes)"
+    desc "System sleep time (in minutes). Set to zero to disable."
     
     munge do |value|
       @resource.munge_integer(value)
     end
     defaultto 30 # Mac OS X Default
   end
-  
-  newproperty(:disk_sleep) do
-    desc "Disk sleep/spin down time (in minutes)"
-    
-    munge do |value|
-      @resource.munge_integer(value)
-    end
-    defaultto 10 # Mac OS X Default
-  end
-  
-  newproperty(:display_sleep) do
-    desc "Display sleep time (in minutes)"
-    
-    munge do |value|
-      @resource.munge_integer(value)
-    end
-    defaultto 10 # Mac OS X Default
-  end
-  
+
   newproperty(:wake_on_lan, :boolean => true) do
-    desc "Whether the system will respond to a magic ethernet wake packet."
-    
-    newvalue(:true)
-    newvalue(:false)
+    desc "Enable wake on lan magic packet. Allows you to wake the system from sleep using a special packet."
+
+    newvalues(:true, :false)
     
     defaultto :true
     
@@ -80,27 +67,23 @@ Puppet::Type.newtype(:powermgmt) do
       @resource.munge_boolean(value)
     end    
   end
-  
-  newproperty(:power_button_sleeps, :boolean => true) do
-    desc "Whether the power button will cause the system to sleep or not.
-    The alternative is to shut down immediately (if false)
-    "
-    
-    newvalue(:true)
-    newvalue(:false)
-    
+
+  newproperty(:autorestart, :boolean => true) do
+    desc "Automatically restart on power loss."
+
+    newvalues(:true, :false)
+
     defaultto :true # Mac OS X Default
-    
+
     munge do |value|
       @resource.munge_boolean(value)
     end
   end
-  
-  newproperty(:autorestart, :boolean => true) do
-    desc "Automatically restart on power loss."
-    
-    newvalue(:true)
-    newvalue(:false)
+
+  newproperty(:power_button_sleeps, :boolean => true) do
+    desc "Power button causes system to sleep instead of shut down."
+
+    newvalues(:true, :false)
     
     defaultto :true # Mac OS X Default
     
@@ -109,16 +92,51 @@ Puppet::Type.newtype(:powermgmt) do
     end
   end
 
-  # pmset -g doesn't display current halfdim setting
-  # newproperty(:display_is_dimmed, :boolean => true) do
-  #   desc "Does the display sleep dim the screen instead of powering off?"
-  #   
-  #   newvalue(:true)
-  #   newvalue(:false)
-  #   defaultto :true
-  #   
-  #   munge do |value|
-  #     @resource.munge_boolean(value)
-  #   end
-  # end  
+  newproperty(:lidwake, :boolean => true) do
+    desc "Wake the system when the laptop lid is opened."
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:acwake, :boolean => true) do
+    desc "Wake the system when the power source is changed (Battery to AC or vice versa)."
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:lessbright, :boolean => true) do
+    desc "Turn brightness down slightly when switching to this power source."
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:halfdim, :boolean => true) do
+    desc "Display sleep only dims the display to half brightness instead of shutting off the display."
+
+    newvalues(:true, :false)
+  end
+
+  newproperty(:sms, :boolean => true) do
+    desc "Use sudden motion sensor to park disk heads on sudden changes in G force."
+
+    newvalues(:true, :false)
+  end
+
+  # not supporting hibernate mode bitmask
+  # not supporting hibername file location
+
+  newproperty(:ttyskeepawake, :boolean => true) do
+    desc "Prevent system sleep when any tty (including remote logins) is active."
+
+    newvalues(:true, :false)
+  end
+
+  # not supporting networkoversleep because you cannot change it anyway
+
+  newproperty(:destroyfvkeyonstandby, :boolean => true) do
+    desc "Destroy filevault key when going into standby. User will be prompted to re-enter filevault password on wakeup."
+
+    newvalues(:true, :false)
+  end
+
 end

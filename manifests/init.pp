@@ -1,7 +1,7 @@
 # This is an example only, you should not normally include 'puppet-osx-powermgmt'
 
 class puppet-osx-powermgmt {
-    powermgmt { "never sleep":
+    powermgmt { "charger":
     	sleep               => 0, # System sleep time (in minutes) zero means never sleep
     	disk_sleep          => 0, # Disk spin down time (in minutes)
     	display_sleep       => 0, # Display sleep time (in minutes)
