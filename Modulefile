@@ -1,0 +1,7 @@
+name 'mosen-osx-powermgmt'
+version '0.2'
+summary 'Manage power management policies in OSX'
+description 'Manage power management policies in OSX via pmset'
+author 'mosen'
+source 'https://github.com/mosen/puppet-osx-powermgmt.git'
+license 'MIT'
