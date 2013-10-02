@@ -95,11 +95,19 @@ Puppet::Type.newtype(:powermgmt) do
   newproperty(:lidwake, :boolean => true) do
     desc "Wake the system when the laptop lid is opened."
 
+    munge do |value|
+      @resource.munge_boolean(value)
+    end
+
     newvalues(:true, :false)
   end
 
   newproperty(:acwake, :boolean => true) do
     desc "Wake the system when the power source is changed (Battery to AC or vice versa)."
+
+    munge do |value|
+      @resource.munge_boolean(value)
+    end
 
     newvalues(:true, :false)
   end
@@ -107,17 +115,29 @@ Puppet::Type.newtype(:powermgmt) do
   newproperty(:lessbright, :boolean => true) do
     desc "Turn brightness down slightly when switching to this power source."
 
+    munge do |value|
+      @resource.munge_boolean(value)
+    end
+
     newvalues(:true, :false)
   end
 
   newproperty(:halfdim, :boolean => true) do
     desc "Display sleep only dims the display to half brightness instead of shutting off the display."
 
+    munge do |value|
+      @resource.munge_boolean(value)
+    end
+
     newvalues(:true, :false)
   end
 
   newproperty(:sms, :boolean => true) do
     desc "Use sudden motion sensor to park disk heads on sudden changes in G force."
+
+    munge do |value|
+      @resource.munge_boolean(value)
+    end
 
     newvalues(:true, :false)
   end
@@ -128,6 +148,10 @@ Puppet::Type.newtype(:powermgmt) do
   newproperty(:ttyskeepawake, :boolean => true) do
     desc "Prevent system sleep when any tty (including remote logins) is active."
 
+    munge do |value|
+      @resource.munge_boolean(value)
+    end
+
     newvalues(:true, :false)
   end
 
@@ -135,6 +159,10 @@ Puppet::Type.newtype(:powermgmt) do
 
   newproperty(:destroyfvkeyonstandby, :boolean => true) do
     desc "Destroy filevault key when going into standby. User will be prompted to re-enter filevault password on wakeup."
+
+    munge do |value|
+      @resource.munge_boolean(value)
+    end
 
     newvalues(:true, :false)
   end

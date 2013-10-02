@@ -119,6 +119,9 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
 
   # womp - wake on ethernet magic packet (value = 0/1)
   def wake_on_lan
+    return nil unless @property_hash.has_key? 'womp'
+    return nil unless @property_hash['womp'] == '0' || @property_hash['womp'] == '1'
+    
     @property_hash['womp'] == '1' ? :true : :false
   end
 
@@ -128,6 +131,9 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
 
   # autorestart - automatic restart on power loss (value = 0/1)
   def autorestart
+    return nil unless @property_hash.has_key? 'autorestart'
+    return nil unless @property_hash['autorestart'] == '0' || @property_hash['autorestart'] == '1'
+    
     @property_hash['autorestart'] == '1' ? :true : :false
   end
 
@@ -137,6 +143,9 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
 
   # powerbutton - sleep the machine when power button is pressed (value = 0/1)
   def power_button_sleeps
+    return nil unless @property_hash.has_key? 'powerbutton'
+    return nil unless @property_hash['powerbutton'] == '0' || @property_hash['powerbutton'] == '1'
+    
     @property_hash['powerbutton'] == '1' ? :true : :false
   end
 
@@ -146,7 +155,10 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
 
   # lidwake - wake the machine when the laptop lid (or clamshell) is opened (value = 0/1)
   def lidwake
-    @property_hash['lidwake'] || nil
+    return nil unless @property_hash.has_key? 'lidwake'
+    return nil unless @property_hash['lidwake'] == '0' || @property_hash['lidwake'] == '1'
+    
+    @property_hash['lidwake'] == '1' ? :true : :false
   end
 
   def lidwake=(enabled)
@@ -155,7 +167,10 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
 
   # acwake - wake the machine when power source (AC/battery) is changed (value = 0/1)
   def acwake
-    @property_hash['acwake'] || nil
+    return nil unless @property_hash.has_key? 'acwake'
+    return nil unless @property_hash['acwake'] == '0' || @property_hash['acwake'] == '1'
+    
+    @property_hash['acwake'] == '1' ? :true : :false
   end
 
   def acwake=(enabled)
@@ -164,7 +179,10 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   
   # lessbright - slightly turn down display brightness when switching to this power source (value = 0/1)
   def lessbright
-    @property_hash['lessbright'] || nil
+    return nil unless @property_hash.has_key? 'lessbright'
+    return nil unless @property_hash['lessbright'] == '0' || @property_hash['lessbright'] == '1'
+    
+    @property_hash['lessbright'] == '1' ? :true : :false
   end
 
   def lessbright=(enabled)
@@ -173,7 +191,10 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
 
   # halfdim - display sleep will use an intermediate half-brightness state between full brightness and fully off  (value = 0/1)
   def halfdim
-    @property_hash['halfdim'] || nil
+    return nil unless @property_hash.has_key? 'halfdim'
+    return nil unless @property_hash['halfdim'] == '0' || @property_hash['halfdim'] == '1'
+
+    @property_hash['halfdim'] == '1' ? :true : :false
   end
 
   def halfdim=(enabled)
@@ -182,7 +203,10 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
 
   # sms - use Sudden Motion Sensor to park disk heads on sudden changes in G force (value = 0/1)
   def sms
-    @property_hash['sms'] || nil
+    return nil unless @property_hash.has_key? 'sms'
+    return nil unless @property_hash['sms'] == '0' || @property_hash['sms'] == '1'
+
+    @property_hash['sms'] == '1' ? :true : :false
   end
 
   def sms=(enabled)
@@ -192,7 +216,10 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   # ttyskeepawake - prevent idle system sleep when any tty (e.g. remote login session) is 'active'.
   # A tty is 'inactive' only when its idle time exceeds the system sleep timer. (value = 0/1)
   def ttyskeepawake
-    @property_hash['ttyskeepawake'] || nil
+    return nil unless @property_hash.has_key? 'ttyskeepawake'
+    return nil unless @property_hash['ttyskeepawake'] == '0' || @property_hash['ttyskeepawake'] == '1'
+    
+    @property_hash['ttyskeepawake'] == '1' ? :true : :false
   end
 
   def ttyskeepawake=(enabled)
@@ -201,7 +228,10 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
 
   # destroyfvkeyonstandby - Destroy File Vault Key when going to standby mode.
   def destroyfvkeyonstandby
-    @property_hash['destroyfvkeyonstandby'] || nil
+    return nil unless @property_hash.has_key? 'destroyfvkeyonstandby'
+    return nil unless @property_hash['destroyfvkeyonstandby'] == '0' || @property_hash['destroyfvkeyonstandby'] == '1'
+
+    @property_hash['destroyfvkeyonstandby'] == '1' ? :true : :false
   end
 
   def destroyfvkeyonstandby=(enabled)
