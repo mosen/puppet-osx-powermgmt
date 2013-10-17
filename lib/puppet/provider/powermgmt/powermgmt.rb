@@ -6,18 +6,18 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   confine :operatingsystem => :darwin
   defaultfor :operatingsystem => :darwin
 
+  Source_To_Switch = {
+      :all => '-a',
+      :battery => '-b',
+      :charger => '-c'
+  }
+
   attr_accessor :source
-  
+
   class << self
 
-    source_to_switch = {
-        :all => '-a',
-        :battery => '-b',
-        :charger => '-c'
-    }
-
     def instances
-      profiles = {}
+      profiles = Hash.new
       current_profile = 'default'
       output = pmset '-g', 'custom'
 
@@ -53,7 +53,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   
     def prefetch(resources)
 
-      profiles = {}
+      @profiles = Hash.new
       current_profile = 'default'
       output = pmset '-g', 'custom'
 
@@ -67,17 +67,17 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
                 "Battery Power:" => :battery
             }[$~.to_s]
 
-            profiles[current_profile] = Hash.new
+            @profiles[current_profile] = Hash.new
           else
             line_hash = line.strip.split(/\s+/)
-            profiles[current_profile][line_hash[0]] = line_hash[1]
+            @profiles[current_profile][line_hash[0]] = line_hash[1]
         end
       end
 
       # Select only the required prefetched resources
       resources.each do |name, resource|
-        if self.profiles.has_key?(name)
-          resource.provider = new(self.profiles[name])
+        if @profiles.has_key?(name)
+          resource.provider = new(@profiles[name])
         else
           resource.provider = new()
         end
@@ -95,7 +95,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def display_sleep=(minutes)
-    pmset @@source_to_switch[@source], 'displaysleep', minutes
+    pmset Source_To_Switch[@source], 'displaysleep', minutes
   end
 
   # disksleep - disk spindown timer; replaces 'spindown' argument in 10.4 (value in minutes, or 0 to disable)
@@ -104,7 +104,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def disk_sleep=(minutes)
-    pmset @@source_to_switch[@source], 'disksleep', minutes
+    pmset Source_To_Switch[@source], 'disksleep', minutes
   end
 
   # sleep - system sleep timer (value in minutes, or 0 to disable)
@@ -114,7 +114,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def sleep=(minutes)
-    pmset @@source_to_switch[@source], 'sleep', minutes
+    pmset Source_To_Switch[@source], 'sleep', minutes
   end
 
   # womp - wake on ethernet magic packet (value = 0/1)
@@ -126,7 +126,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def wake_on_lan=(enabled)
-    pmset @@source_to_switch[@source], 'womp', (enabled === :true ? '1' : '0')
+    pmset Source_To_Switch[@source], 'womp', (enabled === :true ? '1' : '0')
   end
 
   # autorestart - automatic restart on power loss (value = 0/1)
@@ -138,7 +138,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def autorestart=(enabled)
-    pmset @@source_to_switch[@source], 'autorestart', (enabled === :true ? '1' : '0')
+    pmset Source_To_Switch[@source], 'autorestart', (enabled === :true ? '1' : '0')
   end
 
   # powerbutton - sleep the machine when power button is pressed (value = 0/1)
@@ -150,7 +150,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def power_button_sleeps=(enabled)
-    pmset @@source_to_switch[@source], 'powerbutton', (enabled === :true ? '1' : '0')
+    pmset Source_To_Switch[@source], 'powerbutton', (enabled === :true ? '1' : '0')
   end
 
   # lidwake - wake the machine when the laptop lid (or clamshell) is opened (value = 0/1)
@@ -162,7 +162,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def lidwake=(enabled)
-    pmset @@source_to_switch[@source], 'lidwake', (enabled === :true ? '1' : '0')
+    pmset Source_To_Switch[@source], 'lidwake', (enabled === :true ? '1' : '0')
   end
 
   # acwake - wake the machine when power source (AC/battery) is changed (value = 0/1)
@@ -174,7 +174,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def acwake=(enabled)
-    pmset @@source_to_switch[@source], 'acwake', (enabled === :true ? '1' : '0')
+    pmset Source_To_Switch[@source], 'acwake', (enabled === :true ? '1' : '0')
   end
   
   # lessbright - slightly turn down display brightness when switching to this power source (value = 0/1)
@@ -186,7 +186,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def lessbright=(enabled)
-    pmset @@source_to_switch[@source], 'lessbright', (enabled === :true ? '1' : '0')
+    pmset Source_To_Switch[@source], 'lessbright', (enabled === :true ? '1' : '0')
   end
 
   # halfdim - display sleep will use an intermediate half-brightness state between full brightness and fully off  (value = 0/1)
@@ -198,7 +198,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def halfdim=(enabled)
-    pmset @@source_to_switch[@source], 'halfdim', (enabled === :true ? '1' : '0')
+    pmset Source_To_Switch[@source], 'halfdim', (enabled === :true ? '1' : '0')
   end
 
   # sms - use Sudden Motion Sensor to park disk heads on sudden changes in G force (value = 0/1)
@@ -210,8 +210,35 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def sms=(enabled)
-    pmset @@source_to_switch[@source], 'sms', (enabled === :true ? '1' : '0')
+    pmset Source_To_Switch[@source], 'sms', (enabled === :true ? '1' : '0')
   end
+
+  # change hibernation mode. hibernatemode takes a bitfield argument defining SafeSleep behavior. Passing 0 disables
+  # SafeSleep altogether, forcing the computer into a regular sleep.
+  # See PMSET(1) for SafeSleep bitmask reference.
+  def hibernatemode
+    return nil unless @property_hash.has_key? 'hibernatemode'
+
+    @property_hash['hibernatemode'].to_i
+  end
+
+  def hibernatemode=(sleepmask)
+    pmset Source_To_Switch[@source], 'hibernatemode', sleepmask
+  end
+
+  # standby delay: specifies the delay, in seconds, before writing the hibernation image to disk and powering off memory for
+  # Standby.
+  # You cannot set standbydelay on machines that do not support standby.
+  def standbydelay
+    return nil unless @property_hash.has_key? 'standbydelay'
+
+    @property_hash['standbydelay'].to_i
+  end
+
+  def standbydelay=(seconds)
+    pmset Source_To_Switch[@source], 'standbydelay', seconds
+  end
+
 
   # ttyskeepawake - prevent idle system sleep when any tty (e.g. remote login session) is 'active'.
   # A tty is 'inactive' only when its idle time exceeds the system sleep timer. (value = 0/1)
@@ -223,7 +250,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def ttyskeepawake=(enabled)
-    pmset @@source_to_switch[@source], 'ttyskeepawake', (enabled === :true ? '1' : '0')
+    pmset Source_To_Switch[@source], 'ttyskeepawake', (enabled === :true ? '1' : '0')
   end
 
   # destroyfvkeyonstandby - Destroy File Vault Key when going to standby mode.
@@ -235,7 +262,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def destroyfvkeyonstandby=(enabled)
-    pmset @@source_to_switch[@source], 'destroyfvkeyonstandby', (enabled === :true ? '1' : '0')
+    pmset Source_To_Switch[@source], 'destroyfvkeyonstandby', (enabled === :true ? '1' : '0')
   end
 
 end

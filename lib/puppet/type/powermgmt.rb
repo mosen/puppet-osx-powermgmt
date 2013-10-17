@@ -5,19 +5,25 @@ Puppet::Type.newtype(:powermgmt) do
 
   def munge_boolean(value)
     case value
-    when true, "true", :true
-      :true
-    when false, "false", :false
-      :false
-    else
-      fail("munge_boolean only takes booleans")
+      when true, "true", :true
+        :true
+      when false, "false", :false
+        :false
+      else
+        fail("munge_boolean only takes booleans")
     end
   end
-  
+
   def munge_integer(value)
-      Integer(value)
+    Integer(value)
   rescue ArgumentError
-      fail("munge_integer only takes integers")
+    fail("munge_integer only takes integers")
+  end
+
+  def munge_bitmask(value)
+    value.to_i(2)
+  rescue ArgumentError
+    fail("munge_bitmask expects base 2 bitmask as a string")
   end
 
   newparam(:source) do
@@ -49,7 +55,7 @@ Puppet::Type.newtype(:powermgmt) do
 
   newproperty(:sleep) do
     desc "System sleep time (in minutes). Set to zero to disable."
-    
+
     munge do |value|
       @resource.munge_integer(value)
     end
@@ -60,12 +66,12 @@ Puppet::Type.newtype(:powermgmt) do
     desc "Enable wake on lan magic packet. Allows you to wake the system from sleep using a special packet."
 
     newvalues(:true, :false)
-    
+
     defaultto :true
-    
+
     munge do |value|
       @resource.munge_boolean(value)
-    end    
+    end
   end
 
   newproperty(:autorestart, :boolean => true) do
@@ -84,9 +90,9 @@ Puppet::Type.newtype(:powermgmt) do
     desc "Power button causes system to sleep instead of shut down."
 
     newvalues(:true, :false)
-    
+
     defaultto :true # Mac OS X Default
-    
+
     munge do |value|
       @resource.munge_boolean(value)
     end
@@ -142,8 +148,23 @@ Puppet::Type.newtype(:powermgmt) do
     newvalues(:true, :false)
   end
 
-  # not supporting hibernate mode bitmask
+  newproperty(:hibernatemode) do
+    desc "Change hibernation mode (use caution). See PMSET(1) for Safe Sleep bitmask. This value expects an integer"
+
+    munge do |value|
+      @resource.munge_integer(value)
+    end
+  end
   # not supporting hibername file location
+
+  newproperty(:standbydelay) do
+    desc "standbydelay specifies the delay, in seconds, before writing the hibernation image to disk and powering off memory for
+     Standby. This is only usable when the host supports standby."
+
+    munge do |value|
+      @resource.munge_integer(value)
+    end
+  end
 
   newproperty(:ttyskeepawake, :boolean => true) do
     desc "Prevent system sleep when any tty (including remote logins) is active."
