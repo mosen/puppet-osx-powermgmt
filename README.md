@@ -2,7 +2,7 @@ Powermgmt - A Puppet resource for OSX Power Management.
 -------------------------------------------------------
 
 This provider is a simple interface to `pmset` which will allow you to set power management features in Mac OS X.
-I haven't updated the provider in some time, you may want to check out dayglojesus/managedmac since he's written an energi saver class for osx.
+I haven't updated the provider in some time, you may want to check out [dayglojesus/managedmac](https://github.com/dayglojesus/managedmac) since he's written an energi saver class for osx.
 
 Features
 --------
