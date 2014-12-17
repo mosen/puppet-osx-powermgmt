@@ -26,13 +26,12 @@ Puppet::Type.newtype(:powermgmt) do
     fail("munge_bitmask expects base 2 bitmask as a string")
   end
 
-  newparam(:source) do
+  newparam(:source, :namevar => true) do
     desc "The type(s) of power source to apply this setting to: charger or battery. AC power also counts as charger."
 
     # UPS currently unsupported
     # I removed :all as an option because it would allow you to create two resources that conflict with each other.
     newvalues(:battery, :charger)
-    isnamevar
   end
 
   newproperty(:display_sleep) do

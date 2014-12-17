@@ -8,7 +8,7 @@ class powermgmt {
     	wake_on_lan         => true, # Turn on wake on lan
     	power_button_sleeps => true, # Pressing the power button sleeps instead of shutting down.
     	autorestart         => true, # Automatically restart on power outage.
-        hibernatemode       => 3, # Create hibernation file
-        standbydelay        => 10, # Delay creation of hibernation image.
+      hibernatemode       => 3, # Create hibernation file
+      standbydelay        => 10, # Delay creation of hibernation image.
     }
 }

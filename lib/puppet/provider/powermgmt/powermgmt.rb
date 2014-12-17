@@ -6,7 +6,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   confine :operatingsystem => :darwin
   defaultfor :operatingsystem => :darwin
 
-  Source_To_Switch = {
+  SOURCE_OPT = {
       :all => '-a',
       :battery => '-b',
       :charger => '-c'
@@ -95,7 +95,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def display_sleep=(minutes)
-    pmset Source_To_Switch[@source], 'displaysleep', minutes
+    pmset SOURCE_OPT[resource[:source]], 'displaysleep', minutes
   end
 
   # disksleep - disk spindown timer; replaces 'spindown' argument in 10.4 (value in minutes, or 0 to disable)
@@ -104,7 +104,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def disk_sleep=(minutes)
-    pmset Source_To_Switch[@source], 'disksleep', minutes
+    pmset SOURCE_OPT[resource[:source]], 'disksleep', minutes
   end
 
   # sleep - system sleep timer (value in minutes, or 0 to disable)
@@ -114,7 +114,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def sleep=(minutes)
-    pmset Source_To_Switch[@source], 'sleep', minutes
+    pmset SOURCE_OPT[resource[:source]], 'sleep', minutes
   end
 
   # womp - wake on ethernet magic packet (value = 0/1)
@@ -126,7 +126,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def wake_on_lan=(enabled)
-    pmset Source_To_Switch[@source], 'womp', (enabled === :true ? '1' : '0')
+    pmset SOURCE_OPT[resource[:source]], 'womp', (enabled === :true ? '1' : '0')
   end
 
   # autorestart - automatic restart on power loss (value = 0/1)
@@ -138,7 +138,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def autorestart=(enabled)
-    pmset Source_To_Switch[@source], 'autorestart', (enabled === :true ? '1' : '0')
+    pmset SOURCE_OPT[resource[:source]], 'autorestart', (enabled === :true ? '1' : '0')
   end
 
   # powerbutton - sleep the machine when power button is pressed (value = 0/1)
@@ -150,7 +150,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def power_button_sleeps=(enabled)
-    pmset Source_To_Switch[@source], 'powerbutton', (enabled === :true ? '1' : '0')
+    pmset SOURCE_OPT[resource[:source]], 'powerbutton', (enabled === :true ? '1' : '0')
   end
 
   # lidwake - wake the machine when the laptop lid (or clamshell) is opened (value = 0/1)
@@ -162,7 +162,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def lidwake=(enabled)
-    pmset Source_To_Switch[@source], 'lidwake', (enabled === :true ? '1' : '0')
+    pmset SOURCE_OPT[resource[:source]], 'lidwake', (enabled === :true ? '1' : '0')
   end
 
   # acwake - wake the machine when power source (AC/battery) is changed (value = 0/1)
@@ -174,7 +174,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def acwake=(enabled)
-    pmset Source_To_Switch[@source], 'acwake', (enabled === :true ? '1' : '0')
+    pmset SOURCE_OPT[resource[:source]], 'acwake', (enabled === :true ? '1' : '0')
   end
   
   # lessbright - slightly turn down display brightness when switching to this power source (value = 0/1)
@@ -186,7 +186,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def lessbright=(enabled)
-    pmset Source_To_Switch[@source], 'lessbright', (enabled === :true ? '1' : '0')
+    pmset SOURCE_OPT[resource[:source]], 'lessbright', (enabled === :true ? '1' : '0')
   end
 
   # halfdim - display sleep will use an intermediate half-brightness state between full brightness and fully off  (value = 0/1)
@@ -198,7 +198,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def halfdim=(enabled)
-    pmset Source_To_Switch[@source], 'halfdim', (enabled === :true ? '1' : '0')
+    pmset SOURCE_OPT[resource[:source]], 'halfdim', (enabled === :true ? '1' : '0')
   end
 
   # sms - use Sudden Motion Sensor to park disk heads on sudden changes in G force (value = 0/1)
@@ -210,7 +210,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def sms=(enabled)
-    pmset Source_To_Switch[@source], 'sms', (enabled === :true ? '1' : '0')
+    pmset SOURCE_OPT[resource[:source]], 'sms', (enabled === :true ? '1' : '0')
   end
 
   # change hibernation mode. hibernatemode takes a bitfield argument defining SafeSleep behavior. Passing 0 disables
@@ -223,7 +223,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def hibernatemode=(sleepmask)
-    pmset Source_To_Switch[@source], 'hibernatemode', sleepmask
+    pmset SOURCE_OPT[resource[:source]], 'hibernatemode', sleepmask
   end
 
   # standby delay: specifies the delay, in seconds, before writing the hibernation image to disk and powering off memory for
@@ -236,7 +236,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def standbydelay=(seconds)
-    pmset Source_To_Switch[@source], 'standbydelay', seconds
+    pmset SOURCE_OPT[resource[:source]], 'standbydelay', seconds
   end
 
 
@@ -250,7 +250,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def ttyskeepawake=(enabled)
-    pmset Source_To_Switch[@source], 'ttyskeepawake', (enabled === :true ? '1' : '0')
+    pmset SOURCE_OPT[resource[:source]], 'ttyskeepawake', (enabled === :true ? '1' : '0')
   end
 
   # destroyfvkeyonstandby - Destroy File Vault Key when going to standby mode.
@@ -262,7 +262,7 @@ Puppet::Type.type(:powermgmt).provide :powermgmt, :parent => Puppet::Provider do
   end
 
   def destroyfvkeyonstandby=(enabled)
-    pmset Source_To_Switch[@source], 'destroyfvkeyonstandby', (enabled === :true ? '1' : '0')
+    pmset SOURCE_OPT[resource[:source]], 'destroyfvkeyonstandby', (enabled === :true ? '1' : '0')
   end
 
 end
